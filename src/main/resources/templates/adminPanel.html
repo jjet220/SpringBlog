@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ Панель</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h5 {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .fs-3 {
+            color: #212529;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-action-btn {
+            margin-right: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .post-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+                .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #dee2e6;
+            transition: transform 0.2s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .table-responsive {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table th {
+            background: linear-gradient(135deg, #343a40 0%, #2c3136 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 12px 16px;
+        }
+
+        .table td {
+            padding: 12px 16px;
+            vertical-align: middle;
+        }
+
+        .user-action-btn {
+            margin-right: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .user-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        body {
+            background-color: #f8f9fa;
+        }
+        .admin-container {
+            margin-top: 20px;
+        }
+        .nav-tabs .nav-link {
+            color: #495057;
+            font-weight: 500;
+        }
+        .nav-tabs .nav-link.active {
+            font-weight: 600;
+        }
+        .tab-content {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            padding: 20px;
+            border-radius: 0 0 5px 5px;
+        }
+        .stat-card {
+            border-left: 4px solid #0d6efd;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+        }
+        .user-action-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid admin-container">
+    <h2 class="mb-4"><i class="bi bi-shield-lock"></i> Административная панель</h2>
+
+    <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                <i class="bi bi-people-fill"></i> Пользователи
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts" type="button" role="tab">
+                <i class="bi bi-file-post"></i> Посты
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="chats-tab" data-bs-toggle="tab" data-bs-target="#chats" type="button" role="tab">
+                <i class="bi bi-chat-dots-fill"></i> Чаты
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab">
+                <i class="bi bi-graph-up"></i> Статистика
+            </button>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="general-stats-tab" data-bs-toggle="tab"
+               href="#general-stats" role="tab">
+                <i class="bi bi-bar-chart-fill"></i> Общая статистика
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab">
+                <i class="bi bi-gear-fill"></i> Настройки
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="adminTabsContent">
+        <!-- Вкладка пользователей -->
+        <div class="tab-pane fade show active" id="users" role="tabpanel">
+            <h4 class="mb-4"><i class="bi bi-people-fill"></i> Управление пользователями</h4>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Email</th>
+                        <th>Дата регистрации</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Данные будут загружаться динамически через JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- Пагинация будет добавляться динамически через JavaScript -->
+        </div>
+
+        <!-- Вкладка постов -->
+            <div class="tab-pane fade" id="posts" role="tabpanel">
+                <h4 class="mb-4"><i class="bi bi-file-post"></i> Управление постами</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Заголовок</th>
+                            <th>Автор</th>
+                            <th>Дата</th>
+                            <th>Лайки</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Данные будут загружаться динамически -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Пагинация будет добавляться динамически -->
+            </div>
+
+
+        <!-- Вкладка чатов -->
+        <div class="tab-pane fade" id="chats" role="tabpanel">
+            <h4 class="mb-4"><i class="bi bi-chat-dots-fill"></i> Управление чатами</h4>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <button id="chat-btn-create" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Создать новый чат
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>ID создателя</th>
+                        <th>Создатель</th>
+                        <th>Сообщений</th>
+                        <th>Дата создания</th>
+                        <th>Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Данные будут загружаться динамически -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- Пагинация будет добавляться динамически -->
+        </div>
+
+        <!-- Вкладка статистики -->
+        <div class="tab-pane fade" id="stats" role="tabpanel">
+            <h4 class="mb-4"><i class="bi bi-graph-up"></i> Статистика сайта</h4>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <h5><i class="bi bi-people"></i> Пользователи</h5>
+                        <p class="fs-3" id="stats-users-count">0</p>
+                        <p class="text-success" id="stats-users-daily">+0 за день</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <h5><i class="bi bi-file-post"></i> Посты</h5>
+                        <p class="fs-3" id="stats-posts-count">0</p>
+                        <p class="text-success" id="stats-posts-daily">+0 за день</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <h5><i class="bi bi-chat-left-text"></i> Сообщения</h5>
+                        <p class="fs-3" id="stats-messages-count">0</p>
+                        <p class="text-success" id="stats-messages-daily">+0 за день</p>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="mt-4"><i class="bi bi-globe"></i> География посетителей</h5>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Страна</th>
+                        <th>Посетители</th>
+                        <th>%</th>
+                    </tr>
+                    </thead>
+                    <tbody id="stats-geography">
+
+                    </tbody>
+                </table>
+            </div>
+
+            <h5 class="mt-4"><i class="bi bi-calendar"></i> Активность за последние 7 дней</h5>
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="activityChart"></canvas>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="general-stats" role="tabpanel">
+            <h4 class="mb-4"><i class="bi bi-bar-chart-fill"></i> Общая статистика</h4>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <h5><i class="bi bi-people"></i> Всего пользователей</h5>
+                        <p class="fs-3" id="total-users-count">0</p>
+                        <p class="text-muted">Зарегистрировано на платформе</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <h5><i class="bi bi-file-post"></i> Всего постов</h5>
+                        <p class="fs-3" id="total-posts-count">0</p>
+                        <p class="text-muted">Создано пользователями</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <h5><i class="bi bi-chat-left-text"></i> Всего комментариев</h5>
+                        <p class="fs-3" id="total-comments-count">0</p>
+                        <p class="text-muted">Оставлено под постами</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <h5><i class="bi bi-activity"></i> Активность</h5>
+                        <div class="d-flex justify-content-between">
+                            <span>Постов на пользователя:</span>
+                            <span id="posts-per-user">0</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Комментариев на пост:</span>
+                            <span id="comments-per-post">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stat-card">
+                        <h5><i class="bi bi-clock-history"></i> Обновлено</h5>
+                        <p id="stats-update-time">—</p>
+                        <button class="btn btn-sm btn-outline-primary" onclick="loadGeneralStats()">
+                            <i class="bi bi-arrow-clockwise"></i> Обновить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка настроек -->
+        <div class="tab-pane fade" id="settings" role="tabpanel">
+            <h4 class="mb-4"><i class="bi bi-gear-fill"></i> Настройки сайта</h4>
+
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="siteName" class="form-label">Название сайта</label>
+                        <input type="text" class="form-control" id="siteName" value="Мой Социальный Сайт">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="siteLogo" class="form-label">Логотип сайта</label>
+                        <input class="form-control" type="file" id="siteLogo">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="adminEmail" class="form-label">Email администратора</label>
+                        <input type="email" class="form-control" id="adminEmail" value="admin@example.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="supportEmail" class="form-label">Email поддержки</label>
+                        <input type="email" class="form-control" id="supportEmail" value="support@example.com">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="siteDescription" class="form-label">Описание сайта</label>
+                    <textarea class="form-control" id="siteDescription" rows="3">Социальная сеть для общения и обмена новостями</textarea>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="maintenanceMode" class="form-label">Режим обслуживания</label>
+                        <select class="form-select" id="maintenanceMode">
+                            <option value="0">Выключен</option>
+                            <option value="1">Включен</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="registrationStatus" class="form-label">Регистрация новых пользователей</label>
+                        <select class="form-select" id="registrationStatus">
+                            <option value="1" selected>Разрешена</option>
+                            <option value="0">Запрещена</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="enableNotifications" checked>
+                    <label class="form-check-label" for="enableNotifications">Включить уведомления</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/checkAdmin.js}"></script>
+<script th:src="@{/js/adminPanel.js}"></script>
+<script th:src="@{/js/createChat.js}"></script>
+<script th:src="@{/js/statistic.js}"></script>
+<script th:src="@{/js/otherStatistic.js}"></script>
+
+</body>
+</html>

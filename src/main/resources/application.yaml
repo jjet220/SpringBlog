@@ -1,0 +1,47 @@
+spring:
+  profiles:
+    active: main
+  datasource:
+    url: jdbc:mysql://127.127.126.26:3306/spring_web_blog
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      fail-on-empty-beans: false
+      write-dates-as-timestamps: false
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database: mysql
+    show-sql: true
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+ # kafka:
+  #  bootstrap-servers: localhost:9092
+   # producer:
+     # key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      #value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+   # consumer:
+     # group-id: user-group
+     # auto-offset-reset: earliest
+     # key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      #value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      #properties:
+      #  spring.json.trusted.packages: "*"
+    #listener:
+      #missing-topics-fatal: false
+
+#app:
+  #kafka:
+    #topics:
+      #user-events: user-events
+      #topic-1: topic-1
+      #topic-2: topic-2
+      #multi-type: multi-type
+
+token:
+  signing:
+    key: 53A73E5F1C4E0A2D3B5F2D784E6A1B423D6F247D1F6E5C3A596D635A75327855

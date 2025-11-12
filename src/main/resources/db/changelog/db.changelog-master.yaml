@@ -1,0 +1,298 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: your_name
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: date_of_birth
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: registration_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: roles
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: avatar
+                  type: LONGBLOB
+              - column:
+                  name: avatar_content_type
+                  type: varchar(100)
+
+  - changeSet:
+      id: 2
+      author: your_name
+      changes:
+        - createTable:
+            tableName: posts
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name_post
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: likes
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: views
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_of_publication
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: text
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: theme
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_post_user
+                    references: users(id)
+
+  - changeSet:
+      id: 3
+      author: your_name
+      changes:
+        - createTable:
+            tableName: comments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: likes
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_of_publication
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: text
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_comment_user
+                    references: users(id)
+              - column:
+                  name: post_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_comment_post
+                    references: posts(id)
+  - changeSet:
+      id: create_comment_likes_table
+      author: your_name
+      changes:
+        - createTable:
+            tableName: comment_likes
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_comment_like_user
+                    references: users(id)
+              - column:
+                  name: comment_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_comment_like_comment
+                    references: comments(id)
+            constraints:
+              - primaryKey:
+                  columnNames: user_id, comment_id
+                  constraintName: pk_comment_likes
+
+  - changeSet:
+      id: 4
+      author: your_name
+      changes:
+        - createTable:
+            tableName: chat
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_chat_user
+                    references: users(id)
+              - column:
+                  name: creation_date
+                  type: date
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 5
+      author: your_name
+      changes:
+        - createTable:
+            tableName: messages
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: publication_date_time
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: text_of_message
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_message_user
+                    references: users(id)
+              - column:
+                  name: chat_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_message_chat
+                    references: chat(id)
+
+  - changeSet:
+      id: create_friends_table
+      author: your_name
+      changes:
+        - createTable:
+            tableName: user_friends
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_friends_user
+                    references: users(id)
+              - column:
+                  name: friend_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_friends_friend
+                    references: users(id)
+              - column:
+                  name: status
+                  type: tinyint(1)
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+            constraints:
+              - primaryKey:
+                  columnNames: user_id, friend_id
+                  constraintName: pk_user_friends
+
+  - changeSet:
+      id: create_favorite_posts_table
+      author: your_name
+      changes:
+        - createTable:
+            tableName: user_favorite_posts
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_favorites_user
+                    references: users(id)
+              - column:
+                  name: post_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_favorites_post
+                    references: posts(id)
+            constraints:
+              - primaryKey:
+                  columnNames: user_id, post_id
+                  constraintName: pk_user_favorites

@@ -1,0 +1,1022 @@
+<!doctype html>
+<html class="no-js" lang="" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Главная страница</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="description" content="">
+
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <meta property="og:image:alt" content="">
+
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <link rel="manifest" href="site.webmanifest">
+    <meta name="theme-color" content="#fafafa">
+    <style>
+
+        .navbar-search {
+            width: 300px;
+        }
+
+        .search-results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .search-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .search-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .search-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-avatar-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .search-loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .stats-loading {
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stats-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            color: #721c24;
+        }
+
+        body {
+            background-color: #e9ecef !important;
+        }
+
+        .main-content {
+            background-color: #e9ecef;
+            position: relative;
+        }
+
+        .posts-wrapper {
+            background-color: #e9ecef;
+            padding: 0;
+            margin: 0;
+        }
+
+        #postsContainer {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .post {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Убираем лишние отступы */
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            #postsContainer {
+                padding: 20px 15px;
+                border-radius: 10px;
+                margin: 0 10px;
+            }
+
+            .main-content {
+                padding: 20px 0;
+            }
+
+            .footer-section {
+                padding: 40px 0;
+            }
+        }
+
+        /* Для темной темы */
+        body.dark {
+            background-color: #2d3748 !important;
+        }
+
+        body.dark .main-content {
+            background-color: #2d3748;
+        }
+
+        body.dark .posts-wrapper {
+            background-color: #2d3748;
+        }
+
+        body.dark #postsContainer {
+            background-color: #4a5568;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark .post {
+            background: #4a5568;
+            border-color: #718096;
+        }
+
+        .post-author-avatar,
+        .comment-author-avatar,
+        .message-author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 8px;
+            vertical-align: middle;
+            border: 1px solid #ddd;
+        }
+
+        .post-author-avatar {
+            width: 40px;
+            height: 40px;
+        }
+
+        .comment-author-avatar {
+            width: 28px;
+            height: 28px;
+        }
+
+        .message-author-avatar {
+            width: 24px;
+            height: 24px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            background-color: #f1f1f1;
+            max-width: 80%;
+        }
+
+        .my-message {
+            margin-left: auto;
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Для темной темы */
+        body.dark .message {
+            background-color: #495057;
+            color: #f8f9fa;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+
+        .message-author {
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .message-text {
+            word-wrap: break-word;
+            margin-bottom: 4px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        /* Для темной темы */
+        body.dark .message {
+            background-color: #495057;
+            color: #f8f9fa;
+        }
+
+        body.dark .my-message {
+            background-color: #0056b3;
+        }
+
+        .message-content {
+            word-wrap: break-word;
+        }
+
+        /* Ваши собственные сообщения (можно добавить класс 'own-message' при рендеринге) */
+        .own-message {
+            margin-left: auto;
+            background-color: #007bff;
+            color: white;
+        }
+
+        body.dark .own-message {
+            background-color: #0056b3;
+        }
+        .chat-container {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          width: 300px;
+          background-color: white;
+          border-radius: 10px;
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+          z-index: 1000;
+          transition: all 0.3s ease;
+          overflow: hidden;
+        }
+
+        .chat-header {
+          background-color: #343a40;
+          color: white;
+          padding: 10px 15px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          cursor: pointer;
+        }
+
+        .chat-header span {
+          font-weight: bold;
+        }
+
+        .btn-toggle-chat {
+          background: none;
+          border: none;
+          color: white;
+          padding: 0;
+          font-size: 1.2rem;
+        }
+
+        .chat-body {
+          display: block;
+          height: 300px;
+        }
+
+        .chat-container.collapsed .chat-body {
+          display: none;
+        }
+
+        .chat-messages {
+          height: calc(100% - 50px);
+          overflow-y: auto;
+          padding: 10px;
+        }
+
+        .chat-input {
+          display: flex;
+          padding: 10px;
+          border-top: 1px solid #eee;
+        }
+
+        .chat-input input {
+          flex-grow: 1;
+          margin-right: 5px;
+        }
+
+        /* Темная тема для чата */
+        body.dark .chat-container {
+          background-color: #343a40;
+          border: 1px solid #495057;
+        }
+
+        body.dark .chat-header {
+          background-color: #212529;
+        }
+
+        body.dark .chat-input {
+          border-top-color: #495057;
+        }
+
+        body.dark .chat-messages {
+          background-color: #343a40;
+          color: #f8f9fa;
+        }
+        #commentsModal .modal-dialog {
+            max-width: 800px;
+        }
+        .comments-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            margin: 15px 0;
+        }
+
+        .comments-pagination button {
+            margin: 0 5px;
+            min-width: 100px;
+        }
+
+        .comments-pagination span {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Для темной темы */
+        body.dark .comments-pagination {
+            border-color: #444;
+        }
+
+        body.dark .comments-pagination span {
+            color: #aaa;
+        }
+
+        .comments-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .comment {
+            padding: 12px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 3px solid #007bff;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .comment-author {
+            font-weight: bold;
+        }
+
+        .comment-date {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .comment-content {
+            margin-bottom: 8px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .comment-like-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .comment-like-button:hover {
+            color: #dc3545;
+        }
+
+        .add-comment-form textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Темная тема для комментариев */
+        body.dark .comment {
+            background-color: #2c3e50;
+            border-left-color: #3498db;
+        }
+
+        body.dark .comment-content {
+            color: #ecf0f1;
+        }
+
+        body.dark .comment-date {
+            color: #bdc3c7;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Темы */
+        body.light {
+            background-color: #f4f4f4;
+            --post-bg: #fff;
+            --text-color: #333;
+            --border-color: #ddd;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark {
+            background-color: #2c3e50;
+            --post-bg: #34495e;
+            --text-color: #ecf0f1;
+            --border-color: #2c3e50;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        body.blue {
+            background-color: #e6f2ff;
+            --post-bg: #f0f8ff;
+            --text-color: #003366;
+            --border-color: #b3d1ff;
+            --shadow-color: rgba(0, 102, 204, 0.1);
+        }
+
+        /* Переключатель тем */
+        .theme-switcher {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: flex;
+            gap: 5px;
+        }
+
+        .theme-switcher button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 0px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .post {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 600px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: min-height 0.3s ease;
+        }
+
+        .post.expanded {
+            height: auto;
+        }
+
+        .post-content-container {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        .post-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+
+        .post-content.expanded {
+            -webkit-line-clamp: unset;
+            overflow: visible;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .post-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .post-footer {
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .like-button, .comment-button {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .like-button:hover, .comment-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .delete-button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px 10px;
+            color: #dc3545;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .delete-button:hover {
+            color: #a71d2a;
+            text-decoration: underline;
+        }
+        .edit-button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px 10px;
+            color: #007bff; /* Синий цвет */
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s ease;
+        }
+
+        .edit-button:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        .edit-icon, .delete-icon {
+            font-size: 1.1rem;
+        }
+        .like-icon, .comment-icon {
+            font-size: 1.2rem;
+        }
+
+        .like-count, .comment-count {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .comments-section {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .pagination button.active {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        #postsContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }
+        .author-link {
+            color: var(--link-color, #007bff);
+            text-decoration: none;
+        }
+
+        .author-link:hover {
+            text-decoration: underline;
+        }
+        .post-title {
+            margin: 0;
+            font-size: 1.5rem;
+            word-break: break-word;
+            flex: 1;
+            min-width: 200px;
+        }
+        .post-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .post-theme {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 1rem;
+            margin: 5px 0 10px;
+            width: 100%;
+        }
+
+        .theme-dropdown {
+          margin-bottom: 15px;
+        }
+
+        .theme-dropdown .dropdown-menu {
+          max-height: 200px;
+          overflow-y: auto;
+        }
+
+        .theme-selected {
+          margin-top: 5px;
+          font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .post {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .post-header {
+                flex-direction: column;
+            }
+
+            .post-controls {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body style="background-color: #e9ecef;">
+<div id="loading-overlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Загрузка...</span>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand me-4" href="http://localhost:8080/welcome">
+            <img src="/images/R7iW4fmaKrA.png" alt="Логотип" height="30" class="d-inline-block align-top">
+        </a>
+
+        <!-- Поисковая строка -->
+        <div class="navbar-search me-auto">
+            <div class="input-group">
+                <input type="text" id="search-input" class="form-control"
+                       placeholder="Поиск..." aria-label="Поиск">
+                <button class="btn btn-outline-light" type="button" id="search-button">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="http://localhost:8080/welcome">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="http://localhost:8080/ribbon">Лента</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="profile-link" href="http://localhost:8080/profile/" style="display: none;">Профиль</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="logout-link" href="http://localhost:8080/logout" style="display: none;">Выход</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="login-link" href="http://localhost:8080/authentication" style="display: block;">Войти</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="admin-panel-link" href="http://localhost:8080/panel-admin">Админ Панель</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="modal fade" id="searchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Результаты поиска</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="searchTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="users-tab" data-bs-toggle="tab"
+                                data-bs-target="#users-results" type="button" role="tab">
+                            <i class="bi bi-people"></i> Пользователи
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="posts-tab" data-bs-toggle="tab"
+                                data-bs-target="#posts-results" type="button" role="tab">
+                            <i class="bi bi-file-post"></i> Посты
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-3">
+                    <div class="tab-pane fade show active" id="users-results" role="tabpanel">
+                        <div id="users-results-container" class="search-results">
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-search" style="font-size: 2rem;"></i>
+                                <p>Введите запрос для поиска пользователей</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="posts-results" role="tabpanel">
+                        <div id="posts-results-container" class="search-results">
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-search" style="font-size: 2rem;"></i>
+                                <p>Введите запрос для поиска постов</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="main-content" style="background-color: #e9ecef; min-height: calc(100vh - 200px); padding: 30px 0;">
+    <div class="container text-center mb-4">
+        <div class="row">
+            <div class="col-lg-4 mx-auto">
+                <h1 id="Hq">Главная страница</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-4">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#postFormModal">
+            Создать пост
+        </button>
+    </div>
+
+    <div class="posts-wrapper" style="background-color: #e9ecef;">
+        <div id="postsContainer" class="container" style="background-color: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <!-- Посты будут здесь -->
+        </div>
+    </div>
+
+    <div id="pagination" class="container mt-4 mb-4 text-center">
+        <!-- Пагинация будет здесь -->
+    </div>
+</div>
+
+<!-- Футер с контактной информацией -->
+<footer class="footer-section" style="background-color: #6c757d; color: white; padding: 60px 0;">
+    <div class="container">
+        <div class="row">
+            <!-- О нас -->
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">О нас</h5>
+                <p>Мы - современная социальная платформа для общения и обмена мнениями. Наша цель - создать комфортное пространство для пользователей.</p>
+            </div>
+
+            <!-- Контакты -->
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Контакты</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">📧 Email: info@socialplatform.ru</li>
+                    <li class="mb-2">📞 Телефон: +7 (800) 123-45-67</li>
+                    <li class="mb-2">📍 Адрес: г. Москва, ул. Примерная, д. 123</li>
+                </ul>
+            </div>
+
+            <!-- Вакансии -->
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Вакансии</h5>
+                <p>Присоединяйтесь к нашей команде! Мы ищем талантливых разработчиков и дизайнеров.</p>
+                <a href="#" class="btn btn-outline-light btn-sm">Посмотреть вакансии</a>
+            </div>
+        </div>
+
+        <hr style="border-color: rgba(255,255,255,0.3); margin: 40px 0;">
+
+        <div class="row">
+            <!-- Партнеры -->
+            <div class="col-md-6 mb-4">
+                <h5 class="mb-3">Наши партнеры</h5>
+                <div class="row">
+                    <div class="col-4 text-center mb-3">
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                            <span style="font-size: 24px;">🏢</span>
+                            <p class="mb-0 small mt-2">TechCorp</p>
+                        </div>
+                    </div>
+                    <div class="col-4 text-center mb-3">
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                            <span style="font-size: 24px;">💻</span>
+                            <p class="mb-0 small mt-2">DevSoft</p>
+                        </div>
+                    </div>
+                    <div class="col-4 text-center mb-3">
+                        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;">
+                            <span style="font-size: 24px;">🌐</span>
+                            <p class="mb-0 small mt-2">WebSolutions</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Социальные сети -->
+            <div class="col-md-6 mb-4">
+                <h5 class="mb-3">Мы в соцсетях</h5>
+                <div class="d-flex gap-3">
+                    <a href="#" class="btn btn-outline-light" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 18px;">📘</span>
+                    </a>
+                    <a href="#" class="btn btn-outline-light" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 18px;">📸</span>
+                    </a>
+                    <a href="#" class="btn btn-outline-light" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 18px;">🐦</span>
+                    </a>
+                    <a href="#" class="btn btn-outline-light" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 18px;">🎬</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border-color: rgba(255,255,255,0.3); margin: 40px 0;">
+
+        <!-- Копирайт -->
+        <div class="text-center">
+            <p class="mb-0">© 2024 SocialPlatform. Все права защищены.</p>
+            <p class="small mt-2">Политика конфиденциальности | Условия использования</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Модальное окно создания поста -->
+<div class="modal fade" id="postFormModal" tabindex="-1" aria-labelledby="postFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="postFormModalLabel">Создание нового поста</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="postForm">
+                    <div class="mb-3">
+                        <label for="postTitle" class="form-label">Заголовок поста:</label>
+                        <input type="text" class="form-control" id="postTitle" name="postTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Тема</label>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                    id="themeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Выберите тему
+                            </button>
+                            <ul class="dropdown-menu" id="themeList" aria-labelledby="themeDropdown">
+                                <!-- Темы будут добавляться динамически -->
+                            </ul>
+                            <input type="hidden" id="selectedTheme" name="theme">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="postContent" class="form-label">Текст поста:</label>
+                        <textarea class="form-control" id="postContent" name="postContent" rows="5" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="submit" form="postForm" class="btn btn-primary">Опубликовать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Чат -->
+<div class="chat-container">
+    <div class="chat-header">
+        <span>Онлайн-чат</span>
+        <button class="btn btn-sm btn-toggle-chat">
+            <i class="bi bi-dash"></i>
+        </button>
+    </div>
+    <div class="chat-body">
+        <div class="chat-messages" id="chatMessages">
+        </div>
+        <div class="chat-input">
+            <input type="text" class="form-control" placeholder="Введите сообщение..." id="chatInput">
+            <button class="btn btn-primary btn-send">Отправить</button>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/GetAvatar.js}"></script>
+<script th:src="@{/js/posting.js}"></script>
+<script th:src="@{/js/loadposts.js}"></script>
+<script th:src="@{/js/MyProfile.js}"></script>
+<script th:src="@{/js/chat.js}"></script>
+<script src="/js/search.js"></script>
+</body>
+
+</html>
